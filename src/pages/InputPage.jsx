@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { React, useState } from 'react';
+import { React, useState, Fragment } from "react";
 import { GrMap } from "react-icons/gr";
-import  "../styles/InputPage.css";
-import Address from '../components/Address';
+import "../styles/InputPage.css";
+import Address from "../components/Address";
 
 const InputpageContainer = styled.div`
   background-color: #e3e3e3;
@@ -14,34 +14,35 @@ const InputpageContainer = styled.div`
 `;
 
 const InputPage = () => {
-  const [countList, setCountList] = useState([0])
+  const [countList, setCountList] = useState(0);
 
-  const onAdd = () => { //여기 함수
-    let countArr = [...countList]
-    let counter = countArr.slice(-1)[0]
-    counter += 1
-    countArr.push(counter)
-    setCountList(countArr)
-  }
+  const handleAddClick = () => {
+    setCountList(countList + 1);
+  };
+
+  const countListArray = Array.from({ length: countList }, (_, i) => i);
 
   return (
-  <InputpageContainer>
-    <div className="page">
-      <div className="titlewrap">
-        <GrMap className="icon"/>
-        <br />
-        출발지를 입력하고
-        <br />
-        중간 지점과 추천 맛집 정보를 받아보세요!
-      </div>
+    <InputpageContainer>
+      <div className="page">
+        <div className="titlewrap">
+          <GrMap className="icon" />
+          <br />
+          출발지를 입력하고
+          <br />
+          중간 지점과 추천 맛집 정보를 받아보세요!
+        </div>
 
-      <div>
-        <Address countList={countList} /> 
-        <button onClick={onAdd}>친구 추가</button>
+        <div>
+          {countListArray.map((count, index) => (
+            <Fragment key={`${count}-${index}`}>
+              <Address />
+            </Fragment>
+          ))}
+          <button onClick={handleAddClick}>친구 추가</button>
+        </div>
       </div>
-
-    </div>
-  </InputpageContainer>
+    </InputpageContainer>
   );
 };
 export default InputPage;
