@@ -18,14 +18,73 @@
 }
 
 .titlewrap{
-  margin-top: 50px;
+  margin-top: 40px;
   font-size: 20px;
   font-weight: 700;
   color: #262626;
 }
 
 .icon{
-  font-size: 50px;
+  font-size: 45px;
   margin-bottom: 10px;
   color: #262626;
+}
+
+.contentwrap{
+  margin-top: 5px;
+  flex: 1;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.inputwrap{
+  border-radius: 8px;
+  padding: 13px;
+  margin-top: 8px;
+  margin: 20px;
+  background-color: white;
+  border: 1px solid #e3e3e3;
+}
+
+.input{
+  width: 95%;
+  outline: none;
+  border: none;
+  height: 17px;
+}
+
+.searchbutton{
+  background-color: #e3e3e3;
+  border: #e3e3e3;
+  height: 25px;
+  width: 50px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.addbutton{
+  background-color: white;
+  border: white;
+  cursor: pointer;
+  color: #262626;
+  font-size: small;
+}
+
+.addicon{
+  font-size: medium;
+  color: #BBD6B8;
+}
+
+.submitbutton{
+  background-color: #BBD6B8;
+  border: #BBD6B8;
+  border-radius: 5px;
+  height: 40px;
+  width: 300px;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  margin: 20px;
+  margin-left: 430px;
+  cursor: pointer;
 }

@@ -1,8 +1,10 @@
 import styled from "styled-components";
-import { React, useState } from 'react';
+import { React, useState, Fragment } from "react";
 import { GrMap } from "react-icons/gr";
+import { BsFillPersonPlusFill } from "react-icons/bs";
 import  "../styles/InputPage.css";
 import Address from '../components/Address';
+import { useNavigate } from 'react-router-dom';
 
 const InputpageContainer = styled.div`
   background-color: #e3e3e3;
@@ -14,58 +16,42 @@ const InputpageContainer = styled.div`
 `;
 
 const InputPage = () => {
-  const [countList, setCountList] = useState([0])
+  const [countList, setCountList] = useState(0);
+  const navigate = useNavigate();
 
-  const onAdd = () => { //여기 함수
-    let countArr = [...countList]
-    let counter = countArr.slice(-1)[0]
-    counter += 1
-    countArr.push(counter)
-    setCountList(countArr)
+  const handleAddClick = () => {
+    setCountList(countList + 1);
+  };
+
+  const handleSubmitClick = () => {
+    navigate('/result');
   }
 
+  const countListArray = Array.from({ length: countList }, (_, i) => i);
+
   return (
-  <InputpageContainer>
+    <InputpageContainer>
     <div className="page">
       <div className="titlewrap">
-        <GrMap className="icon"/>
+        <GrMap className="icon" />
         <br />
         출발지를 입력하고
         <br />
         중간 지점과 추천 맛집 정보를 받아보세요!
       </div>
 
-      <div>
-        <Address countList={countList} /> 
-        <button onClick={onAdd}>친구 추가</button>
+      <div className="contentwrap">
+        {countListArray.map((count, index) => (
+          <Fragment key={`${count}-${index}`}>
+            <Address />
+          </Fragment>
+        ))}
+        <BsFillPersonPlusFill className="addicon"/>
+        <button className="addbutton" onClick={handleAddClick}>친구 추가하기</button>     
       </div>
-
+      <button className="submitbutton" onClick={handleSubmitClick}>중간장소 찾기</button>
     </div>
   </InputpageContainer>
   );
 };
 export default InputPage;
-
-/*const InputPage = () => {
-  return (
-  <InputpageContainer>
-    <div className="page">
-      <div className="titlewrap">
-        <GrMap className="icon"/>
-        <br />
-        출발지를 입력하고
-        <br />
-        중간 지점과 추천 맛집 정보를 받아보세요!
-      </div>
-
-      <div>
-        <AddressList />
-        <button type='button'>친구 추가</button>
-      </div>
-
-    </div>
-  </InputpageContainer>
-  );
-};
-
-export default InputPage;*/
