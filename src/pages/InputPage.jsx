@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { React, useState, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import { GrMap } from "react-icons/gr";
 import { BsFillPersonPlusFill } from "react-icons/bs";
-import  "../styles/InputPage.css";
-import Address from '../components/Address';
-import { useNavigate } from 'react-router-dom';
+import "../styles/InputPage.css";
+import Address from "../components/Address";
+import { useNavigate } from "react-router-dom";
 
 const InputpageContainer = styled.div`
   background-color: #e3e3e3;
@@ -17,6 +17,7 @@ const InputpageContainer = styled.div`
 
 const InputPage = () => {
   const [countList, setCountList] = useState(0);
+  const [addressList, setAddressList] = useState([]);
   const navigate = useNavigate();
 
   const handleAddClick = () => {
@@ -24,34 +25,44 @@ const InputPage = () => {
   };
 
   const handleSubmitClick = () => {
-    navigate('/result');
-  }
+    navigate("/result");
+  };
 
   const countListArray = Array.from({ length: countList }, (_, i) => i);
 
+  const handleAdressList = (newAdress) => {
+    setAddressList([...addressList, newAdress]);
+  };
+
   return (
     <InputpageContainer>
-    <div className="page">
-      <div className="titlewrap">
-        <GrMap className="icon" />
-        <br />
-        출발지를 입력하고
-        <br />
-        중간 지점과 추천 맛집 정보를 받아보세요!
-      </div>
+      <div className="page">
+        <div className="titlewrap">
+          <GrMap className="icon" />
+          <br />
+          출발지를 입력하고
+          <br />
+          중간 지점과 추천 맛집 정보를 받아보세요!
+        </div>
 
-      <div className="contentwrap">
-        {countListArray.map((count, index) => (
-          <Fragment key={`${count}-${index}`}>
-            <Address />
-          </Fragment>
-        ))}
-        <BsFillPersonPlusFill className="addicon"/>
-        <button className="addbutton" onClick={handleAddClick}>친구 추가하기</button>     
+        <div className="contentwrap">
+          {countListArray.map((count, index) => (
+            <Fragment key={`${count}-${index}`}>
+              <Address handleAdressList={handleAdressList} />
+            </Fragment>
+          ))}
+          {/* 주소들의 배열 확인
+          <p>{JSON.stringify(addressList)}</p> */}
+          <BsFillPersonPlusFill className="addicon" />
+          <button className="addbutton" onClick={handleAddClick}>
+            친구 추가하기
+          </button>
+        </div>
+        <button className="submitbutton" onClick={handleSubmitClick}>
+          중간장소 찾기
+        </button>
       </div>
-      <button className="submitbutton" onClick={handleSubmitClick}>중간장소 찾기</button>
-    </div>
-  </InputpageContainer>
+    </InputpageContainer>
   );
 };
 export default InputPage;

@@ -3,7 +3,7 @@ import PopupPostCode from "../components/PopupPostCode";
 import PopupDom from "../components/PopupDom";
 import  "../styles/InputPage.css";
 
-const Address = () => {
+const Address = ({ handleAdressList }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [address, setAddress] = useState("");
 
@@ -15,13 +15,21 @@ const Address = () => {
     setIsPopupOpen(false);
   };
 
+  const handleAdress = (newAdress) => {
+    // data.address가 들어오는 곳
+    setAddress(newAdress);
+    handleAdressList(newAdress);
+  };
+
   return (
     <div className="inputwrap">
-    <input className="input" 
-          placeholder="출발 주소를 검색해주세요." 
-          type="text" 
-          value={address}
-          readOnly />
+      <input
+        className="input"
+        placeholder="출발 주소를 검색해주세요."
+        type="text"
+        value={address}
+        readOnly
+      />
       <button type="button" className="searchbutton" onClick={openPostCode}>
         검색
       </button>
@@ -30,7 +38,7 @@ const Address = () => {
           <PopupDom>
             <PopupPostCode
               address={address}
-              setAddress={setAddress}
+              setAddress={handleAdress}
               onClose={closePostCode}
             />
           </PopupDom>
