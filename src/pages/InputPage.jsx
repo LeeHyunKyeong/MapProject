@@ -48,7 +48,7 @@ const InputPage = () => {
         <div className="contentwrap">
           {countListArray.map((count, index) => (
             <Fragment key={`${count}-${index}`}>
-              <Address handleAdressList={handleAdressList} />
+              <Address handleAdressList={handleAdressList} index={index}/>
             </Fragment>
           ))}
           <BsFillPersonPlusFill className="addicon" />

@@ -24,7 +24,7 @@ const Address = ({ handleAdressList }) => {
   return (
   <div className="inputwrap">
     <input className="input" 
-          id="address"
+          id={`address-${index}`}
           placeholder="출발 주소를 검색해주세요." 
           type="text" 
           value={address}
