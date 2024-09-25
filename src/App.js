@@ -5,7 +5,7 @@ import Resultpage from './pages/ResultPage';
 
 function App() {
   return (
-  <BrowserRouter>
+  <BrowserRouter basename={process.env.PUBLIC_URL}>
     <Routes>
       <Route path="/" element={<InputpageContainer />} />
       <Route path="/result" element={<Resultpage />} />
