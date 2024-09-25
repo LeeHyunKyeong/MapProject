@@ -1,20 +1,66 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import  "../styles/ResultPage.css";
 import Header from '../components/Header';
+import { useLocation } from 'react-router-dom';
 
 const ResultPage = () => {
 	const { kakao } = window;
+  const location = useLocation();
+  const addressList = location.state?.addressList || [];
+  const [xLoc, setXLoc] = useState(0.0);
+  const [yLoc, setYLoc] = useState(0.0);
+
+  console.log(addressList);
+  var geocoder = new kakao.maps.services.Geocoder();
+  var coordsArray = [];
+  var totalX = 0.0;
+  var totalY = 0.0;
+
+  const calculate = async () => {
+    var promises = addressList.map(address =>
+      new Promise((resolve, reject) => {
+          geocoder.addressSearch(address, function (result, status) {
+              if (status === kakao.maps.services.Status.OK) {
+                  var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                  resolve(coords);
+              } else {
+                  reject(status);
+              }
+          });
+      })
+    );
+
+    try {
+        coordsArray = await Promise.all(promises);
+        console.log(coordsArray);
+    } catch (err) {
+        console.error(err);
+        alert('좌표를 가져오는데 실패했습니다.');
+        return;
+    }
+
+    for (var i = 0; i < coordsArray.length; i++) {
+        totalY += coordsArray[i].getLat();
+        totalX += coordsArray[i].getLng();
+    }
+
+    var averageX = totalX / coordsArray.length;
+    var averageY = totalY / coordsArray.length;
+
+    setXLoc(averageX);
+    setYLoc(averageY);
+  }
+  calculate();
 
 	useEffect(() => {
-    //마커를 담을 배열
-    var markers = [];
-    
-    //지도를 표시
+    console.log(xLoc);
+    console.log(yLoc);
+
     var mapContainer = document.getElementById("map"),
-      mapOption = {
-        center: new kakao.maps.LatLng(37.566826, 126.9786567), //지도의 중심좌표
-        level: 3, 
-      };
+    mapOption = {
+        center: new kakao.maps.LatLng(yLoc,xLoc), //지도의 중심좌표
+        level: 3,
+    };
 
     //지도 생성
     var map = new kakao.maps.Map(mapContainer, mapOption);
@@ -23,12 +69,23 @@ const ResultPage = () => {
     var zoomControl = new kakao.maps.ZoomControl();
     map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
-    //장소 검색 객체 생성
-    var ps = new kakao.maps.services.Places(); 
+    var markers = [];
 
+    var markerPosition  = new kakao.maps.LatLng(yLoc, xLoc);
+    var imageSize = new kakao.maps.Size(49, 50);
+    var markerImage = new kakao.maps.MarkerImage("https://cdn.icon-icons.com/icons2/317/PNG/512/map-marker-icon_34392.png", imageSize);
+    // 마커를 생성합니다
+    var marker = new kakao.maps.Marker({
+      position: markerPosition,
+      image: markerImage,
+    });
+    // 마커가 지도 위에 표시되도록 설정합니다
+    marker.setMap(map);
+
+    var ps = new kakao.maps.services.Places(); 
     var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 }); //검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우 생성
 
-    /*const searchForm = document.querySelector('.form');
+    const searchForm = document.querySelector('.form');
     searchForm.addEventListener('submit', function(e){
       e.preventDefault();
       searchPlaces();
@@ -42,25 +99,11 @@ const ResultPage = () => {
         return false;
       }
 
-      ps.keywordSearch(keyword, placesSearchCB); //장소 검색 객체를 통해 키워드로 장소 검색을 요청함
-    } 검색 가능 버전*/
-
-    var markerPosition  = new kakao.maps.LatLng(37.557553, 126.955197); //<-계산한 중간 지점 좌표
-    var middleMarker = new kakao.maps.Marker({
-    position: markerPosition
-    });
-    middleMarker.setMap(map);
-
-    searchPlaces();
-    function searchPlaces() {
-      var keyword = "맛집";
       var options = {
-        location: markerPosition,
+        location: new kakao.maps.LatLng(yLoc,xLoc),
         radius: 10000,
-        };
-
-      // 장소검색 객체를 통해 키워드로 장소검색을 요청
-      ps.keywordSearch(keyword, placesSearchCB, options);
+      };
+      ps.keywordSearch(keyword, placesSearchCB, options); //장소 검색 객체를 통해 키워드로 장소 검색을 요청함
     }
 
     // 장소 검색 완료 시 호출되는 콜백함수
@@ -100,23 +143,19 @@ const ResultPage = () => {
         bounds.extend(placePosition);
 
         //마커와 검색결과 항목에 mouseover 했을때 해당 장소 인포윈도우에 장소명을 표시
-        (function (marker, title) {
+        (function (marker, title, address, url) {
           kakao.maps.event.addListener(marker, "mouseover", function () {
-            displayInfowindow(marker, title);
-          });
-
-          kakao.maps.event.addListener(marker, "mouseout", function () {
-            infowindow.close();
+            displayInfowindow(marker, title, address, url);
           });
 
           itemEl.onmouseover = function () {
-            displayInfowindow(marker, title);
+            displayInfowindow(marker, title, address, url);
           };
 
           itemEl.onmouseout = function () {
             infowindow.close();
           };
-        })(marker, places[i].place_name);
+        })(marker, places[i].place_name, places[i].road_address_name, places[i].place_url);
 
         fragment.appendChild(itemEl);
       }
@@ -219,8 +258,11 @@ const ResultPage = () => {
 
     //검색결과 목록 또는 마커를 클릭했을 때 호출되는 함수
     //인포윈도우에 장소명을 표시
-    function displayInfowindow(marker, title) {
-      var content ='<div style="padding:5px;z-index:1;color:black">' + title + "</div>";
+    function displayInfowindow(marker, title, address, url) {
+      var content = '<div style="width: 200px; padding:5px; z-index:1; color:black; text-align:center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">';
+      content += '<span style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 2px;">' + title + '</span>';
+      content += '<p style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px;">' + address + '</p>';
+      content += '<a href="' + url + '" target="_blank" style="margin-left:10px; color:blue; font-weight: bold;">더 보기</a></div>';
 
       infowindow.setContent(content);
       infowindow.open(map, marker);
@@ -232,40 +274,29 @@ const ResultPage = () => {
         el.removeChild(el.lastChild);
       }
     }
-  }, []);
+  },[xLoc,yLoc]);
 
   return (
     <div>
       <Header />
       <div className="map_wrap">
-        <div id="map" style={{ width: '100%', height: '90vh', position: 'absolute', overflow: 'hidden' }}></div>
-          <div id="menu_wrap" className="bg_white">
-          <hr />
-          <ul id="placesList"></ul>
-          <div id="pagination"></div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ResultPage;
-
-/*
-<div className="map_wrap">
-    <div id="map" style={{ width: '100%', height: '97vh', position: 'absolute', overflow: 'hidden' }}></div>
-      <div id="menu_wrap" className="bg_white">
-        <div className="option">
-          <div>
-            <form className="form" onSubmit={(e) => e.preventDefault()}>
-              <input type="text" defaultValue="" id="keyword" placeholder="장소를 검색해주세요." size="25" /> 
-              <button type="submit">검색하기</button> 
-            </form>
+      <div id="map" style={{ width: '100%', height: '90vh', position: 'absolute', overflow: 'hidden' }}></div>
+        <div id="menu_wrap" className="bg_white">
+          <div className="option">
+            <div>
+              <form className="form" onSubmit={(e) => e.preventDefault()}>
+                <input type="text" defaultValue="" id="keyword" placeholder="찾고 싶은 장소를 검색해주세요." size="27" /> 
+                <button type="submit">검색하기</button> 
+              </form>
+            </div>
           </div>
-        </div>
         <hr />
         <ul id="placesList"></ul>
       <div id="pagination"></div>
     </div>
   </div>
-  */
+    </div>
+  );
+};
+
+export default ResultPage;

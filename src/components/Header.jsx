@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <div className="header">
       <IoIosArrowBack className="headericon"/>
-      <div className="text">중간장소 맛집 결과 보기</div>
+      <div className="text">중간 지점 결과 보기</div>
     </div>
   );
 };
