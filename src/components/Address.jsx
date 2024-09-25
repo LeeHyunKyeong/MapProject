@@ -3,7 +3,7 @@ import PopupPostCode from "../components/PopupPostCode";
 import PopupDom from "../components/PopupDom";
 import  "../styles/InputPage.css";
 
-const Address = ({ handleAdressList }) => {
+const Address = ({ handleAdressList, index }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [address, setAddress] = useState("");
 
