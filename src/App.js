@@ -15,10 +15,3 @@ function App() {
 }
 
 export default App;
-
-// <HashRouter>
-// <Routes>
-//   <Route path="/" element={<InputpageContainer />} />
-//   <Route path="/result" element={<Resultpage />} />
-// </Routes>
-// </HashRouter>
