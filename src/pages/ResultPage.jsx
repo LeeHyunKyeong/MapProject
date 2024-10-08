@@ -130,7 +130,7 @@ const ResultPage = () => {
         bounds = new kakao.maps.LatLngBounds(),
         listStr = "";
 
-      removeAllChildNods(listEl); //검색 결과 목록에 추가된 항목들을 제거
+      removeAllChildNods(listEl);
       removeMarker(); //지도에 표시되고 있는 마커를 제거
 
       for (var i = 0; i < places.length; i++) {
@@ -181,7 +181,7 @@ const ResultPage = () => {
       } else {
           itemStr += '    <span>' +  places.address_name  + '</span>'; 
       }
-                   
+
         itemStr += '  <span class="tel">' + places.phone  + '</span>' +
                   '</div>';           
   
